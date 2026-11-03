@@ -28,3 +28,8 @@
 8. Контакты: линия прорисовывается, ссылки подчёркиваются, кнопка — магнитная с заливкой; клик по e-mail/телефону копирует их в буфер
 9. Кастомный курсор (точка + кольцо, режим «Смотреть» над проектами), магнитные кнопки
 10. `prefers-reduced-motion` отключает анимации
+
+## SEO / продвижение
+- `robots.txt`, `sitemap.xml` — для поисковиков (адреса прописаны под mescheryakov-dss.github.io/mescheryakov-designer/; при переезде на свой домен замените их).
+- В `<head>` index.html: title, description, canonical, Open Graph (превью `assets/og.jpg` 1200×630), JSON-LD (ProfessionalService).
+- Коды подтверждения Яндекс Вебмастера и Google Search Console вставляются в закомментированный блок в `<head>`.
