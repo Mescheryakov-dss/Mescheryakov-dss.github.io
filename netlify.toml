@@ -1,0 +1,8 @@
+# Настройки для Netlify: статический сайт, корень = эта папка
+[build]
+  publish = "."
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

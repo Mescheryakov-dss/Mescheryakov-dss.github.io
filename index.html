@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MESCHERYAKOV.DESIGNER — дизайн сайтов, логотипы, карточки товара</title>
+  <meta name="description" content="Создаю дизайн сайтов, логотипы и графику. Помогаю собрать визуальный образ вашего проекта — от первого экрана до карточки товара.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta property="og:title" content="MESCHERYAKOV.DESIGNER — дизайн сайтов, логотипы, карточки товара">
+  <meta property="og:description" content="Характер в каждой детали. Дизайн сайтов, айдентика и карточки товара для маркетплейсов.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/web-fitness.jpg">
+  <meta name="theme-color" content="#000000">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ===== PRELOADER ===== -->
+  <div class="preloader" id="preloader">
+    <div class="preloader__inner">
+      <div class="preloader__logo">
+        <span class="preloader__word" data-word="MESCHERYAKOV."><span>M</span><span>E</span><span>S</span><span>C</span><span>H</span><span>E</span><span>R</span><span>Y</span><span>A</span><span>K</span><span>O</span><span>V</span><span>.</span></span><span class="preloader__word preloader__word--red"><span>D</span><span>E</span><span>S</span><span>I</span><span>G</span><span>N</span><span>E</span><span>R</span></span>
+      </div>
+      <div class="preloader__bar"><span></span></div>
+      <div class="preloader__counter"><span id="preCounter">0</span>%</div>
+    </div>
+  </div>
+
+  <!-- ===== CUSTOM CURSOR ===== -->
+  <div class="cursor" id="cursor">
+    <div class="cursor__dot"></div>
+    <div class="cursor__ring"><span class="cursor__label"></span></div>
+  </div>
+
+  <!-- ===== FIXED WATERMARKS ===== -->
+  <div class="watermark watermark--top" aria-hidden="true">
+    <div class="watermark__track"><svg class="wm" viewBox="0 0 1180 200" preserveAspectRatio="none" aria-hidden="true"><text x="0" y="200" textLength="1180" lengthAdjust="spacingAndGlyphs">MESCHERYAKOV.DESIGNER</text></svg><svg class="wm" viewBox="0 0 1180 200" preserveAspectRatio="none" aria-hidden="true"><text x="0" y="200" textLength="1180" lengthAdjust="spacingAndGlyphs">MESCHERYAKOV.DESIGNER</text></svg><svg class="wm" viewBox="0 0 1180 200" preserveAspectRatio="none" aria-hidden="true"><text x="0" y="200" textLength="1180" lengthAdjust="spacingAndGlyphs">MESCHERYAKOV.DESIGNER</text></svg></div>
+  </div>
+  <div class="watermark watermark--bottom" aria-hidden="true">
+    <div class="watermark__track"><svg class="wm" viewBox="0 0 1180 200" preserveAspectRatio="none" aria-hidden="true"><text x="0" y="200" textLength="1180" lengthAdjust="spacingAndGlyphs">MESCHERYAKOV.DESIGNER</text></svg><svg class="wm" viewBox="0 0 1180 200" preserveAspectRatio="none" aria-hidden="true"><text x="0" y="200" textLength="1180" lengthAdjust="spacingAndGlyphs">MESCHERYAKOV.DESIGNER</text></svg><svg class="wm" viewBox="0 0 1180 200" preserveAspectRatio="none" aria-hidden="true"><text x="0" y="200" textLength="1180" lengthAdjust="spacingAndGlyphs">MESCHERYAKOV.DESIGNER</text></svg></div>
+  </div>
+
+  <!-- ===== FIXED HEADER ===== -->
+  <header class="header">
+    <a href="#hero" class="logo" data-cursor="link" aria-label="На главную">
+      <span class="logo__white">MESCHERYAKOV.</span><span class="logo__red">DESIGNER</span>
+    </a>
+
+    <nav class="pills" id="pills" aria-label="Навигация">
+      <a href="#services" class="pill" data-cursor="link"><span>Услуги</span></a>
+      <a href="#hero" class="pill" data-cursor="link"><span>Обо мне</span></a>
+      <a href="#works" class="pill" data-cursor="link"><span>Работы</span></a>
+    </nav>
+
+    <p class="header__note" id="headerNote">Объём, сроки и состав результата<br>согласуем до начала проекта.</p>
+
+    <a href="#contacts" class="discuss" data-cursor="link">
+      <span class="discuss__text">Обсудить проект</span><span class="discuss__arrow">↗</span>
+      <i class="discuss__line"></i>
+    </a>
+  </header>
+
+  <!-- ===== SIDE INDICATOR ===== -->
+  <nav class="side-nav" id="sideNav" aria-label="Разделы">
+    <button class="side-nav__item is-active" data-target="hero" aria-label="Обо мне"><i></i></button>
+    <button class="side-nav__item" data-target="works" aria-label="Работы"><i></i></button>
+    <button class="side-nav__item" data-target="services" aria-label="Услуги"><i></i></button>
+    <button class="side-nav__item" data-target="contacts" aria-label="Контакты"><i></i></button>
+  </nav>
+
+  <div class="year">2025 - 2026</div>
+
+  <!-- ===== MAIN ===== -->
+  <main class="main" id="main">
+
+    <!-- 01 HERO -->
+    <section class="screen hero" id="hero" data-index="0">
+      <div class="hero__photo">
+        <img src="assets/portrait.png" alt="Владислав Мещеряков — дизайнер" draggable="false">
+      </div>
+
+      <div class="hero__content">
+        <h1 class="hero__title">
+          <span class="line"><span class="line__inner">Характер</span></span>
+          <span class="line"><span class="line__inner">в каждой</span></span>
+          <span class="line"><span class="line__inner outline-red">детали.</span></span>
+        </h1>
+        <p class="hero__desc reveal">
+          Создаю дизайн сайтов, логотипы и графику.<br>
+          Помогаю собрать визуальный образ вашего<br>
+          проекта — от первого экрана до карточки товара.
+        </p>
+        <a href="#works" class="btn-dark reveal magnetic" data-cursor="link">
+          <span class="btn-dark__bg"></span>
+          <span class="btn-dark__text">Смотреть работы<i class="btn-dark__arrow">↓</i></span>
+        </a>
+      </div>
+    </section>
+
+    <!-- 02 WORKS -->
+    <section class="screen works" id="works" data-index="1">
+      <h2 class="works__title">
+        <span class="line"><span class="line__inner">Избраные <em class="outline-red">проекты</em></span></span>
+      </h2>
+
+      <div class="works__stage">
+
+        <!-- Левая стопка: веб-сайты. Наведение на размытую карточку «прокручивает» её на передний план -->
+        <div class="stack stack--web" id="stackWeb">
+          <figure class="card wcard slot-a tilt" data-cursor="link">
+            <img src="assets/web-perfume.jpg" alt="Perfume-Mode — дизайн сайта" draggable="false">
+            <span class="tag">Веб-сайты</span>
+          </figure>
+          <figure class="card wcard slot-b tilt" data-cursor="link">
+            <img src="assets/web-fitness.jpg" alt="X'FLOW GYM — дизайн сайта" draggable="false">
+            <span class="tag">Веб-сайты</span>
+          </figure>
+          <figure class="card wcard slot-c tilt" data-cursor="link">
+            <img src="assets/web-drone.jpg" alt="MDR Ultra Light — дизайн сайта" draggable="false">
+            <span class="tag">Веб-сайты</span>
+          </figure>
+        </div>
+
+        <!-- Правая колода: карточки товара. Наведение поднимает карточку вверх и снимает размытие -->
+        <div class="stack stack--cards" id="stackCards">
+          <figure class="card pcard deck-3" data-cursor="link">
+            <img src="assets/card-coffee.jpg" alt="BrewMe — карточка товара" draggable="false">
+            <span class="tag">карточки товара</span>
+          </figure>
+          <figure class="card pcard deck-2" data-cursor="link">
+            <img src="assets/card-pajama.jpg" alt="DreamWear — карточка товара" draggable="false">
+            <span class="tag">карточки товара</span>
+          </figure>
+          <figure class="card pcard deck-1" data-cursor="link">
+            <img src="assets/card-sweater.jpg" alt="Свитер — карточка товара" draggable="false">
+            <span class="tag">карточки товара</span>
+          </figure>
+        </div>
+
+        <div class="works__text">
+          <p class="works__t1"><span class="line"><span class="line__inner">Неповторимый подход</span></span></p>
+          <p class="works__t2"><span class="line"><span class="line__inner">к визуальным задачам</span></span></p>
+          <p class="works__t3"><span class="line"><span class="line__inner">в каждом проекте</span></span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 SERVICES -->
+    <section class="screen services" id="services" data-index="2">
+      <h2 class="services__title">
+        <span class="line"><span class="line__inner">Что <em>нужно</em></span></span>
+        <span class="line"><span class="line__inner">вашему <em>проекту ?</em></span></span>
+      </h2>
+
+      <ul class="services__list">
+        <li class="service" data-preview="assets/web-fitness.jpg">
+          <a href="#contacts" class="service__link" data-cursor="link">
+            <span class="service__num">01</span>
+            <span class="service__name">Веб-сайты</span>
+            <span class="service__desc">Дизайн лендингов, сайтов компаний и портфолио. Композиция, типографика и адаптивные макеты.</span>
+            <span class="service__arrow">↗</span>
+          </a>
+        </li>
+        <li class="service" data-preview="assets/web-perfume.jpg">
+          <a href="#contacts" class="service__link" data-cursor="link">
+            <span class="service__num">02</span>
+            <span class="service__name">Логотипы и айдентика</span>
+            <span class="service__desc">Логотип, палитра, шрифты и элементы фирменного стиля, которые работают вместе.</span>
+            <span class="service__arrow">↗</span>
+          </a>
+        </li>
+        <li class="service" data-preview="assets/card-sweater.jpg">
+          <a href="#contacts" class="service__link" data-cursor="link">
+            <span class="service__num">03</span>
+            <span class="service__name">Карточки товара</span>
+            <span class="service__desc">Главные изображения, инфографика и оформление товарной линейки для маркетплейсов.</span>
+            <span class="service__arrow">↗</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="service-preview" id="servicePreview"><img src="" alt=""></div>
+    </section>
+
+    <!-- 04 CONTACTS -->
+    <section class="screen contacts" id="contacts" data-index="3">
+      <h2 class="contacts__title">
+        <span class="line"><span class="line__inner">Ваш проект.</span></span>
+        <span class="line"><span class="line__inner">Новый визуальный</span></span>
+        <span class="line"><span class="line__inner red">Характер.</span></span>
+      </h2>
+      <p class="contacts__desc reveal">
+        Расскажите, что нужно сделать. Если есть примеры,<br>
+        материалы или желаемые сроки — приложите их к сообщению.
+      </p>
+
+      <div class="contacts__rule reveal-line"></div>
+
+      <div class="contacts__row">
+        <a href="https://t.me/Alex26b" target="_blank" rel="noopener" class="contact reveal" data-cursor="link">ТГ - @Alex26b</a>
+        <a href="mailto:m.vlad2003@inbox.ru" class="contact reveal" data-copy="m.vlad2003@inbox.ru" data-cursor="link">m.vlad2003@inbox.ru</a>
+        <a href="tel:+79633050339" class="contact reveal" data-copy="+79633050339" data-cursor="link">+79633050339</a>
+      </div>
+
+      <a href="mailto:m.vlad2003@inbox.ru" class="btn-red reveal magnetic" data-cursor="link">
+        <span class="btn-red__fill"></span>
+        <span class="btn-red__text">Напишите мне</span>
+      </a>
+    </section>
+
+  </main>
+
+  <div class="toast" id="toast">Скопировано</div>
+
+  <script src="script.js"></script>
+</body>
+</html>
