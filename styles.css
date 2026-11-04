@@ -410,6 +410,9 @@ body.loaded .cursor { opacity: 1; }
 /* после появления задержки убираем, чтобы hover-эффекты были мгновенными */
 .works.is-active .card.is-settled { transition-delay: 0s; }
 .card img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; display: block; }
+.stack-caption, .service__preview-toggle, .service__inline-preview { display: none; }
+.card[role="button"] { -webkit-tap-highlight-color: transparent; }
+.card:focus-visible { outline: 2px solid var(--red); outline-offset: 5px; }
 
 /* ---- Левая стопка: веб-сайты (слоты a / b / c) ---- */
 .wcard { aspect-ratio: 16 / 10; border-radius: calc(14 * var(--px)); overflow: hidden;
@@ -622,59 +625,181 @@ body.loaded .cursor { opacity: 1; }
 .toast.is-visible { opacity: 1; transform: translate(-50%, 0); }
 
 /* =====================================================================
-   Экран ниже 1024 — упрощённая адаптивная версия
+   TABLET / MOBILE
+   Телефон = та же композиция, что и на компьютере, пересчитанная на
+   холст 390 px: все размеры в calc(N * var(--m)), где --m = 1/390 ширины.
+   Hover-состояния переведены в касания (JS), все анимации сохранены.
    ===================================================================== */
 @media (max-width: 1024px) {
   :root { --px: calc(100vw / 1024); --pad-x: calc(48 * var(--px)); }
 }
 
+/* Невысокие планшеты / телефоны в альбомной ориентации: масштаб по высоте */
+@media (min-width: 761px) and (max-width: 1024px) and (max-height: 720px) {
+  :root { --px: calc(100vh / 900); --pad-x: calc(48 * var(--px)); }
+}
+
 @media (max-width: 760px) {
-  :root { --px: calc(100vw / 400); --pad-x: 20px; }
-  body { overflow: auto; }
-  .main { height: auto; overflow: visible; scroll-snap-type: none; }
-  .screen { height: auto; min-height: 100svh; padding: 100px var(--pad-x) 80px; }
-  .watermark--top { height: 14vw; }
-  .watermark--bottom { top: auto; bottom: 0; height: 14vw; }
-  .watermark--bottom .watermark__track { top: 0; }
-  .wm { width: 180vw; height: 30vw; }
-  .header { height: 72px; }
-  .logo { font-size: 15px; }
-  .pills { display: none; }
+  :root {
+    --m: calc(100vw / 390);
+    --px: var(--m);                  /* 1 дизайн-px десктопных правил = 1 px телефона */
+    --pad-x: calc(20 * var(--m));
+    --head: calc(96 * var(--m) + env(safe-area-inset-top));
+  }
+
+  /* Полноэкранные секции и snap-прокрутка — как на компьютере */
+  .main { height: 100vh; height: 100dvh; scroll-snap-type: y mandatory; }
+  .screen {
+    height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: var(--head) var(--pad-x) calc(86 * var(--m));
+    overflow: hidden;
+  }
+
+  /* ---------- водяные знаки ---------- */
+  .watermark--top { height: calc(66 * var(--m)); }
+  .watermark--bottom { top: auto; bottom: 0; height: calc(64 * var(--m)); }
+  .watermark__track { left: var(--pad-x); gap: calc(40 * var(--m)); }
+  .watermark--bottom .watermark__track { top: calc(-14 * var(--m)); }
+  .wm { width: calc(620 * var(--m)); height: calc(105 * var(--m)); }
+  @keyframes wmLeft  { from { transform: translateX(0); } to { transform: translateX(calc(-660 * var(--m))); } }
+  @keyframes wmRight { from { transform: translateX(calc(-660 * var(--m))); } to { transform: translateX(0); } }
+
+  /* ---------- шапка: логотип + «Обсудить проект» в первой строке, пилюли во второй ---------- */
+  .header { height: var(--head); align-items: flex-start; }
+  .logo { position: absolute; left: var(--pad-x); top: calc(18 * var(--m) + env(safe-area-inset-top)); font-size: calc(13.5 * var(--m)); }
+  .discuss { position: absolute; right: var(--pad-x); top: calc(17 * var(--m) + env(safe-area-inset-top)); font-size: calc(12.5 * var(--m)); padding-bottom: 3px; }
+  .pills {
+    left: 50%; top: calc(54 * var(--m) + env(safe-area-inset-top));
+    transform: translateX(-50%); gap: calc(8 * var(--m)); width: max-content;
+  }
+  .pills.is-hidden { opacity: 1; visibility: visible; transform: translateX(-50%); }
+  .pill { padding: calc(6 * var(--m)) calc(13 * var(--m)) calc(7 * var(--m)); border-radius: calc(7 * var(--m)); font-size: calc(12.5 * var(--m)); white-space: nowrap; }
   .header__note { display: none; }
-  .discuss { font-size: 13px; }
-  .side-nav { display: none; }
-  .year { display: none; }
 
-  .hero__photo { position: relative; left: auto; top: auto; width: 78%; height: auto; aspect-ratio: 401/700; margin: 0 auto 24px; max-height: 60svh; }
-  .hero__content { position: relative; left: auto; top: auto; }
-  .hero__title { font-size: 13vw; }
-  .hero__desc { margin-top: 24px; font-size: 14px; }
+  /* индикатор разделов и год — как на десктопе, у правого края */
+  .side-nav { right: calc(4 * var(--m)); top: 50%; transform: translateY(-50%); gap: calc(12 * var(--m)); }
+  .side-nav__item { width: calc(26 * var(--m)); height: calc(16 * var(--m)); }
+  .side-nav__item i { width: calc(11 * var(--m)); height: 1.5px; }
+  .side-nav__item.is-active i { width: calc(18 * var(--m)); height: 2.5px; }
+  .year { right: var(--pad-x); bottom: calc(16 * var(--m) + env(safe-area-inset-bottom)); font-size: calc(10 * var(--m)); }
+
+  /* ---------- 01 HERO: заголовок слева сверху, портрет справа снизу ---------- */
+  .hero { justify-content: flex-start; padding-top: calc(var(--head) + 18 * var(--m)); }
+  .hero__content {
+    position: relative; left: auto; top: auto; z-index: 2;
+    transform: translate3d(0, var(--mobile-content-parallax, 0px), 0);
+  }
+  .hero__title { font-size: calc(46 * var(--m)); line-height: .93; letter-spacing: -.025em; }
+  .hero__desc { margin-top: calc(20 * var(--m)); max-width: calc(300 * var(--m)); font-size: calc(13.5 * var(--m)); line-height: 1.42; letter-spacing: .02em; }
   .hero__desc br { display: none; }
+  .btn-dark { margin-top: calc(16 * var(--m)); padding: calc(9 * var(--m)) calc(13 * var(--m)) calc(10 * var(--m)); border-radius: calc(7 * var(--m)); font-size: calc(13 * var(--m)); }
+  .hero__photo {
+    left: auto; right: calc(22 * var(--m)); top: auto; bottom: 0;
+    height: clamp(calc(230 * var(--m)), calc(100dvh - 392 * var(--m) - env(safe-area-inset-top)), calc(500 * var(--m)));
+    width: auto; aspect-ratio: 401 / 700;
+    transform: translate3d(0, var(--mobile-parallax, 0px), 0);
+  }
 
-  .works__title, .services__title, .contacts__title { position: relative; left: auto; top: auto; font-size: 11vw; }
-  .works__stage { position: relative; inset: auto; margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: center; }
-  .stack { position: static; display: contents; }
-  .card { position: relative; left: auto !important; top: auto !important; width: 100% !important;
-    filter: none !important; scale: 1 !important; translate: none !important; z-index: auto !important; }
-  .pcard.deck-1 { grid-row: span 2; }
-  .tag { font-size: 12px; padding: 8px 14px; border-radius: 20px; }
-  .works__text { position: relative; left: auto; top: auto; transform: none; grid-column: 1 / -1; margin-top: 10px; white-space: normal; }
-  .works__t1 { font-size: 22px; } .works__t2 { font-size: 17px; } .works__t3 { font-size: 14px; }
+  /* ---------- 02 WORKS: стопка сайтов слева, колода карточек справа, текст по центру ---------- */
+  .works__title, .services__title, .contacts__title { position: relative; left: auto; top: auto; }
+  .works__title { font-size: calc(33 * var(--m)); letter-spacing: -.035em; }
+  .works__stage {
+    position: relative; inset: auto; margin-top: calc(24 * var(--m));
+    height: calc(266 * var(--m)); perspective: 1000px;
+    transform: translate3d(0, var(--mobile-stage-parallax, 0px), 0);
+  }
+  .stack { position: absolute; inset: 0; pointer-events: none; }
+  .stack-caption { display: none; }
+  .card { transform: translateY(calc(28 * var(--m))) scale(.96); touch-action: manipulation; }
+  .works.is-active .card { transform: translateY(0) scale(1); }
 
-  .services__list { position: relative; left: auto; top: auto; width: 100%; margin-top: 40px; }
-  .service__link { grid-template-columns: 40px 1fr 20px; grid-template-rows: auto auto; height: auto; padding: 18px 0; row-gap: 6px; }
-  .service__num { font-size: 14px; grid-row: 1; }
-  .service__name { font-size: 22px; grid-row: 1; }
-  .service__desc { grid-column: 2; grid-row: 2; margin-top: 0; font-size: 13px; }
-  .service__arrow { grid-column: 3; grid-row: 1; margin-top: 4px; }
-  .service-preview { display: none; }
+  .wcard { border-radius: calc(11 * var(--m)); box-shadow: 0 calc(14 * var(--m)) calc(34 * var(--m)) rgba(0,0,0,.55); }
+  .wcard.slot-a { left: 0;                   top: calc(10 * var(--m));                   width: calc(152 * var(--m)); filter: blur(2px) brightness(.8); }
+  .wcard.slot-b { left: calc(46 * var(--m)); top: calc(84 * var(--m));  width: calc(154 * var(--m)); }
+  .wcard.slot-c { left: 0;                   top: calc(158 * var(--m)); width: calc(152 * var(--m)); filter: blur(2px) brightness(.8); }
+  .wcard.is-incoming, .wcard.is-tap-active { filter: blur(0) brightness(1); }
 
-  .contacts__title { font-size: 12.5vw; }
-  .contacts__desc { position: relative; left: auto; top: auto; margin-top: 28px; font-size: 15px; }
+  .pcard { border-radius: calc(14 * var(--m)); box-shadow: 0 calc(14 * var(--m)) calc(34 * var(--m)) rgba(0,0,0,.55); }
+  .pcard.deck-1 { left: auto; right: 0; top: calc(90 * var(--m)); width: calc(118 * var(--m)); }
+  .pcard.deck-2 { left: auto; right: 0; top: calc(60 * var(--m)); width: calc(118 * var(--m)); filter: blur(1.5px) brightness(.9); }
+  .pcard.deck-3 { left: auto; right: 0; top: calc(30 * var(--m)); width: calc(118 * var(--m)); filter: blur(2.5px) brightness(.8); }
+  .pcard.deck-1.is-mobile-raised { translate: 0 calc(-12 * var(--m)); z-index: 10; }
+  .pcard.deck-2.is-mobile-raised { translate: 0 calc(-30 * var(--m)); scale: 1; filter: blur(0) brightness(1); z-index: 10; transition-delay: 0s; }
+  .pcard.deck-3.is-mobile-raised { translate: 0 calc(-36 * var(--m)); scale: 1; filter: blur(0) brightness(1); z-index: 10; transition-delay: 0s; }
+  .pcard.is-mobile-raised { animation: none !important; }
+
+  .tag { padding: calc(9 * var(--m)) calc(16 * var(--m)) calc(10 * var(--m)); border-radius: calc(20 * var(--m)); font-size: calc(11.5 * var(--m)); }
+  .card.is-tap-active .tag, .card:focus-visible .tag { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
+  .works__stage { margin-bottom: calc(100 * var(--m)); }
+  .works__text { position: absolute; left: 0; right: 0; top: 100%; transform: none; margin-top: calc(28 * var(--m)); white-space: normal; }
+  .works__t1 { font-size: calc(17.5 * var(--m)); }
+  .works__t2 { font-size: calc(13.5 * var(--m)); margin-top: calc(4 * var(--m)); }
+  .works__t3 { font-size: calc(11.5 * var(--m)); margin-top: calc(6 * var(--m)); }
+
+  /* ---------- 03 SERVICES: список с номером, названием и описанием; превью — по касанию ---------- */
+  .services__title { font-size: calc(31 * var(--m)); line-height: 1.07; letter-spacing: -.045em; }
+  .services__list { position: relative; left: auto; top: auto; width: 100%; margin-top: calc(26 * var(--m)); }
+  .service__link {
+    grid-template-columns: calc(34 * var(--m)) minmax(0, 1fr) calc(18 * var(--m));
+    grid-template-rows: auto auto; align-items: start; column-gap: calc(6 * var(--m));
+    height: auto; padding: calc(15 * var(--m)) 0 calc(13 * var(--m));
+  }
+  .service__num { grid-column: 1; grid-row: 1; font-size: calc(12.5 * var(--m)); padding-top: calc(4 * var(--m)); }
+  .service__name { grid-column: 2; grid-row: 1; font-size: calc(19 * var(--m)); line-height: 1.15; letter-spacing: -.02em; }
+  .service__desc { grid-column: 2; grid-row: 2; margin-top: calc(6 * var(--m)); font-size: calc(12 * var(--m)); line-height: 1.42; }
+  .service__arrow { position: static; grid-column: 3; grid-row: 1; justify-self: end; margin-top: calc(3 * var(--m)); font-size: calc(12 * var(--m)); }
+  /* touch-эквивалент hover строки */
+  .service.is-touched .service__link::before { transform: scaleX(1); }
+  .service.is-touched .service__num { color: var(--red); transform: translateX(calc(4 * var(--m))); }
+  .service.is-touched .service__name { transform: translateX(calc(8 * var(--m))); }
+  .service.is-touched .service__desc { color: #c4c4c4; }
+  .service.is-touched .service__arrow { color: #fff; transform: translate(3px, -3px); }
+  .service__preview-toggle, .service__inline-preview { display: none; }
+  .service-preview { width: calc(150 * var(--m)); border-radius: calc(10 * var(--m)); }
+
+  /* ---------- 04 CONTACTS ---------- */
+  .contacts__title { font-size: calc(35 * var(--m)); line-height: 1.16; letter-spacing: -.03em; }
+  .contacts__desc { position: relative; left: auto; top: auto; margin-top: calc(18 * var(--m)); font-size: calc(13.5 * var(--m)); line-height: 1.5; letter-spacing: .02em; }
   .contacts__desc br { display: none; }
-  .contacts__rule { position: relative; left: auto; right: auto; top: auto; margin-top: 32px; }
-  .contacts__row { position: relative; left: auto; top: auto; transform: none; margin: 24px 0 0; flex-direction: column; gap: 12px; font-size: 14px; }
-  .btn-red { position: relative; left: auto; top: auto; margin: 28px 0 0; transform: none !important; width: 170px; height: 52px; }
+  .contacts__rule { position: relative; left: auto; right: auto; top: auto; margin-top: calc(24 * var(--m)); }
+  .contacts__row {
+    position: relative; left: auto; top: auto; transform: none; margin: calc(20 * var(--m)) 0 0;
+    flex-wrap: wrap; justify-content: center; gap: calc(10 * var(--m)) calc(26 * var(--m));
+    font-size: calc(13.5 * var(--m)); letter-spacing: .02em;
+  }
+  .btn-red {
+    position: relative; left: auto; top: auto; margin: calc(26 * var(--m)) auto 0;
+    width: calc(156 * var(--m)); height: calc(50 * var(--m)); border-radius: calc(25 * var(--m)); font-size: calc(14 * var(--m));
+    transform: translateY(calc(24 * var(--m)));
+  }
+  .btn-red.reveal { transform: translateY(calc(24 * var(--m))); }
+  .contacts.is-active .btn-red.reveal { transform: translateY(0); }
+  .toast { bottom: calc(24px + env(safe-area-inset-bottom)); }
+
+  /* на touch — короткая тактильная реакция вместо hover- и magnetic-состояний */
+  .pill:active { color: #fff; transform: translateY(-1px); }
+  .pill:active::before { transform: translateY(0); }
+  .btn-dark:active .btn-dark__bg::after { transform: translateY(0); }
+  .btn-red:active .btn-red__fill { width: 260%; height: 600%; }
+  .btn-red:active .btn-red__text { color: var(--red); }
+  .contact:active { color: #fff; }
+  .contact:active::after { transform: scaleX(1); transform-origin: left; }
+
+  @media (hover: none) {
+    .card:hover .tag { opacity: 0; transform: translate(-50%, -50%) scale(.7); }
+    .card.is-tap-active:hover .tag { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    .wcard.slot-a:hover:not(.is-tap-active), .wcard.slot-c:hover:not(.is-tap-active) { filter: blur(2px) brightness(.8); }
+    .pcard.deck-1:hover:not(.is-mobile-raised) { translate: 0 0; z-index: 3; }
+    .pcard.deck-2:hover:not(.is-mobile-raised) { translate: 0 0; scale: .9; filter: blur(1.5px) brightness(.9); z-index: 2; }
+    .pcard.deck-3:hover:not(.is-mobile-raised) { translate: 0 0; scale: .8; filter: blur(2.5px) brightness(.8); z-index: 1; }
+  }
+
+  /* очень низкие экраны: разрешаем внутреннюю прокрутку секции вместо обрезки */
+  @media (max-height: 600px) {
+    .screen { justify-content: flex-start; overflow-y: auto; }
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -90,7 +90,7 @@
         activate(Number(e.target.dataset.index));
       }
     });
-  }, { root: isMobile() ? null : main, threshold: [0.55] });
+  }, { root: main, threshold: [0.55] });
   screens.forEach(s => io.observe(s));
 
   /* ------------------------------------------------------------------
@@ -146,6 +146,8 @@
   $$('a[href^="#"]').forEach((a) => a.addEventListener('click', (e) => {
     const target = $(a.getAttribute('href'));
     if (!target) return;
+    // на телефоне первое касание строки услуги показывает превью (аналог hover), переход — по второму
+    if (isTouch && isMobile() && a.classList.contains('service__link') && !a.closest('.service').classList.contains('is-touched')) return;
     e.preventDefault();
     locked = false;
     goTo(screens.indexOf(target));
@@ -262,6 +264,32 @@
     });
   }
 
+  // На телефоне движение мыши заменяет мягкий scroll-параллакс.
+  if (isTouch && !reduced) {
+    let mobileScrollQueued = false;
+    const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+    const updateMobileParallax = () => {
+      mobileScrollQueued = false;
+      const vh = window.innerHeight || 1;
+      const heroRect = $('#hero').getBoundingClientRect();
+      const heroOffset = clamp((vh / 2 - (heroRect.top + heroRect.height / 2)) / vh, -1, 1);
+      photo.style.setProperty('--mobile-parallax', `${heroOffset * 12}px`);
+      heroContent.style.setProperty('--mobile-content-parallax', `${heroOffset * -7}px`);
+      const stageRect = stage.getBoundingClientRect();
+      const stageOffset = clamp((vh * .55 - (stageRect.top + stageRect.height * .35)) / vh, -1, 1);
+      stage.style.setProperty('--mobile-stage-parallax', `${stageOffset * -9}px`);
+    };
+    const queueMobileParallax = () => {
+      if (mobileScrollQueued) return;
+      mobileScrollQueued = true;
+      requestAnimationFrame(updateMobileParallax);
+    };
+    main.addEventListener('scroll', queueMobileParallax, { passive: true });
+    window.addEventListener('scroll', queueMobileParallax, { passive: true });
+    window.addEventListener('resize', queueMobileParallax, { passive: true });
+    queueMobileParallax();
+  }
+
   /* ------------------------------------------------------------------
      6b. ЛЕВАЯ СТОПКА ПРОЕКТОВ: наведение на размытую карточку
          «прокручивает» её на передний план, а передняя уходит на её место.
@@ -351,12 +379,161 @@
     });
   }
 
+  // Touch-эквивалент hover: касание меняет карточку в стопке и показывает тег.
+  // Выход из стопки (касанием в стороне или прокруткой) возвращает исходный порядок.
+  if (isTouch && stackWeb) {
+    const SLOTS = ['slot-a', 'slot-b', 'slot-c'];
+    const webCards = $$('.wcard', stackWeb);
+    const stackCards = $('#stackCards');
+    const productCards = stackCards ? $$('.pcard', stackCards) : [];
+    const slotOf = (el) => SLOTS.find(name => el.classList.contains(name));
+    let touchSwapLock = false;
+    webCards.forEach(card => { card.dataset.home = slotOf(card); });
+
+    const clearProductSelection = () => productCards.forEach(card => {
+      card.classList.remove('is-mobile-raised', 'is-tap-active');
+    });
+    const swapMobileFront = (card) => {
+      if (touchSwapLock) return;
+      const from = slotOf(card);
+      if (!from || from === 'slot-b') return;
+      const front = webCards.find(item => slotOf(item) === 'slot-b');
+      if (!front) return;
+      touchSwapLock = true;
+      card.classList.remove(from);
+      front.classList.remove('slot-b');
+      card.classList.add('slot-b', 'is-incoming');
+      front.classList.add(from, 'is-outgoing');
+      window.setTimeout(() => {
+        card.classList.remove('is-incoming');
+        front.classList.remove('is-outgoing');
+        touchSwapLock = false;
+      }, 850);
+    };
+    const resetMobileStack = () => {
+      webCards.forEach(card => card.classList.remove('is-tap-active'));
+      const home = webCards.find(card => card.dataset.home === 'slot-b');
+      const currentFront = webCards.find(card => slotOf(card) === 'slot-b');
+      if (webCards.every(card => slotOf(card) === card.dataset.home)) return;
+      if (touchSwapLock) { window.setTimeout(resetMobileStack, 120); return; }
+      webCards.forEach(card => {
+        card.classList.remove(...SLOTS, 'is-incoming', 'is-outgoing');
+        card.classList.add(card.dataset.home);
+      });
+      if (home && currentFront && home !== currentFront) {
+        home.classList.add('is-incoming');
+        currentFront.classList.add('is-outgoing');
+        window.setTimeout(() => {
+          home.classList.remove('is-incoming');
+          currentFront.classList.remove('is-outgoing');
+        }, 850);
+      }
+    };
+
+    webCards.forEach(card => {
+      card.addEventListener('click', () => {
+        clearProductSelection();
+        const wasSelectedFront = slotOf(card) === 'slot-b' && card.classList.contains('is-tap-active');
+        webCards.forEach(item => item.classList.remove('is-tap-active'));
+        if (slotOf(card) !== 'slot-b') swapMobileFront(card);
+        if (!wasSelectedFront) card.classList.add('is-tap-active');
+      });
+      card.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); card.click(); }
+      });
+    });
+    productCards.forEach(card => {
+      card.addEventListener('click', () => {
+        webCards.forEach(item => item.classList.remove('is-tap-active'));
+        productCards.forEach(item => item.classList.remove('is-mobile-raised', 'is-tap-active'));
+        card.classList.add('is-mobile-raised', 'is-tap-active');
+      });
+      card.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); card.click(); }
+      });
+    });
+    document.addEventListener('click', e => {
+      if (!stackWeb.contains(e.target)) resetMobileStack();
+      if (stackCards && !stackCards.contains(e.target)) clearProductSelection();
+    });
+    if (isMobile() && 'IntersectionObserver' in window) {
+      const webVisibility = new IntersectionObserver(entries => {
+        entries.forEach(entry => { if (!entry.isIntersecting) resetMobileStack(); });
+      }, { root: main, threshold: .08 });
+      webVisibility.observe(stackWeb);
+      if (stackCards) {
+        const productVisibility = new IntersectionObserver(entries => {
+          entries.forEach(entry => { if (!entry.isIntersecting) clearProductSelection(); });
+        }, { root: main, threshold: .08 });
+        productVisibility.observe(stackCards);
+      }
+    }
+  }
+
   /* ------------------------------------------------------------------
      7. УСЛУГИ: плавающее превью следует за курсором
   ------------------------------------------------------------------ */
   const preview = $('#servicePreview');
   const previewImg = $('img', preview);
   const pv = { x: 0, y: 0, tx: 0, ty: 0, on: false };
+
+  $$('.service__preview-toggle').forEach(button => {
+    button.addEventListener('click', () => {
+      const row = button.closest('.service');
+      const wasOpen = row.classList.contains('is-preview-open');
+      $$('.service').forEach(item => {
+        item.classList.remove('is-preview-open');
+        const toggle = $('.service__preview-toggle', item);
+        const inlinePreview = $('.service__inline-preview', item);
+        if (toggle) {
+          toggle.setAttribute('aria-expanded', 'false');
+          $('span', toggle).textContent = 'Показать пример';
+        }
+        if (inlinePreview) inlinePreview.setAttribute('aria-hidden', 'true');
+      });
+      if (!wasOpen) {
+        row.classList.add('is-preview-open');
+        button.setAttribute('aria-expanded', 'true');
+        $('span', button).textContent = 'Скрыть пример';
+        $('.service__inline-preview', row).setAttribute('aria-hidden', 'false');
+      }
+    });
+  });
+
+  // Телефон: касание строки = hover на десктопе — красная линия, сдвиг названия
+  // и всплывающее превью у пальца. Повторное касание ведёт к контактам.
+  if (isTouch) {
+    const rows = $$('.service');
+    const hideTouchPreview = () => {
+      rows.forEach(r => r.classList.remove('is-touched'));
+      preview.classList.remove('is-visible');
+    };
+    const placePreview = (x, y) => {
+      const r = preview.getBoundingClientRect();
+      const w = r.width || 150, h = r.height || 100;
+      const px = Math.max(w / 2 + 8, Math.min(innerWidth - w / 2 - 8, x + 24 + w / 2));
+      const py = Math.max(h / 2 + 8, Math.min(innerHeight - h / 2 - 8, y - 10));
+      preview.style.left = px + 'px';
+      preview.style.top = py + 'px';
+    };
+    rows.forEach((row) => {
+      const link = $('.service__link', row);
+      link.addEventListener('click', (e) => {
+        if (!isMobile()) return;
+        if (row.classList.contains('is-touched')) { hideTouchPreview(); return; }
+        e.preventDefault();
+        hideTouchPreview();
+        row.classList.add('is-touched');
+        previewImg.src = row.dataset.preview;
+        const x = e.clientX, y = e.clientY;
+        const show = () => { placePreview(x, y); preview.classList.add('is-visible'); };
+        if (previewImg.complete && previewImg.naturalWidth) requestAnimationFrame(show);
+        else previewImg.addEventListener('load', () => requestAnimationFrame(show), { once: true });
+      });
+    });
+    document.addEventListener('click', (e) => { if (!e.target.closest('.service')) hideTouchPreview(); });
+    main.addEventListener('scroll', hideTouchPreview, { passive: true });
+  }
 
   if (!isTouch) {
     $$('.service').forEach((row) => {
@@ -398,17 +575,10 @@
   /* ------------------------------------------------------------------
      9. START
   ------------------------------------------------------------------ */
-  // на мобильном — все секции сразу активны по мере прокрутки
-  if (isMobile()) {
-    const ioM = new IntersectionObserver((entries) => {
-      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('is-active'); });
-    }, { threshold: 0.08 });
-    screens.forEach(s => ioM.observe(s));
-    // страховка: через 4 секунды после старта показываем всё
-    setTimeout(() => screens.forEach(s => s.classList.add('is-active')), 4000);
-  }
-
   main.scrollTop = 0;
-  window.addEventListener('load', () => { main.scrollTop = 0; });
+  window.addEventListener('load', () => {
+    main.scrollTop = 0;
+    if (isMobile() && !location.hash) window.scrollTo(0, 0);
+  });
   runPreloader();
 })();
