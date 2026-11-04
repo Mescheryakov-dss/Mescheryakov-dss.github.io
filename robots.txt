@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://mescheryakov-dss.github.io/mescheryakov-designer/sitemap.xml
+Sitemap: https://mescheryakov-dss.github.io/sitemap.xml
